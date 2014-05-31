@@ -1,0 +1,12 @@
+
+# Package Information for pkg-config
+
+prefix=/usr
+includedir=/usr/include
+
+Name: capi-base-common
+Description: 
+Version: 0.0.1
+Requires:  
+Cflags: -I${includedir}
+

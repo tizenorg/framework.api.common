@@ -1,0 +1,11 @@
+
+Source: capi-base-common
+Section: libs
+Priority: extra
+Maintainer: Woongsuk Cho <ws77.cho@samsung.com>, Junghyuk Park <junghyuk.park@samsung.com>, WonYoung Choi <wy80.choi@samsung.com>
+Build-Depends: debhelper (>= 5), 
+
+Package: capi-base-common-dev
+Architecture: any
+Description: Common header files of Tizen Native API
+

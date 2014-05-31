@@ -1,0 +1,72 @@
+capi-base-common (0.1.0-7) unstable; urgency=low
+
+  * Add TIZEN_ERROR_DRM_CLASS
+  * Git: slp/api/common
+  * Tag: capi-base-common_0.1.0-7
+
+ -- WonYoung Choi <wy80.choi@samsung.com>  Mon, 19 Mar 2012 19:05:23 +0900
+
+capi-base-common (0.1.0-6) unstable; urgency=low
+
+  * Add TIZEN_ERROR_NO_DATA
+  * Git: slp/api/common 
+  * Tag: capi-base-common_0.1.0-6
+
+ -- WonYoung Choi <wy80.choi@samsung.com>  Mon, 27 Feb 2012 15:55:33 +0900
+
+capi-base-common (0.1.0-5) unstable; urgency=low
+
+  * Add TIZEN_ERROR_WEB_CLASS
+  * Git: slp/api/common
+  * Tag: capi-base-common_0.1.0-5
+
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Thu, 02 Feb 2012 17:43:07 +0900
+
+capi-base-common (0.1.0-4) unstable; urgency=low
+
+  * Added AD error class
+  * Git: slp/api/common
+  * Tag: capi-base-common_0.1.0-4
+
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Mon, 30 Jan 2012 14:00:33 +0900
+
+capi-base-common (0.1.0-3) unstable; urgency=low
+
+  * Apply the 'Tizen'
+  * Git: slp/api/common
+  * Tag: capi-base-common_0.1.0-3
+ 
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Wed, 23 Nov 2011 12:16:07 +0900
+
+capi-base-common (0.1.0-2) unstable; urgency=low
+
+  * Add UIX error code
+  * Git: slp-source.sec.samsung.net:slp/api/common
+  * Tag: capi-base-common_0.1.0-2 
+
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Mon, 24 Oct 2011 13:10:53 +0900
+
+capi-base-common (0.1.0-1) unstable; urgency=low
+
+  * Alpha release
+  * Git: slp-source.sec.samsung.net:slp/api/common
+  * Tag: capi-base-common_0.1.0-1
+
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Tue, 27 Sep 2011 20:39:50 +0900
+
+capi-base-common (0.0.1-2) unstable; urgency=low
+
+  * Add UI Error code
+  * Git: slp-source.sec.samsung.net:slp/api/common
+  * Tag: capi-base-common_0.0.1-2
+
+ -- Junghyuk Park <junghyuk.park@samsung.com>  Mon, 26 Sep 2011 11:03:22 +0900
+
+capi-base-common (0.0.1-1) unstable; urgency=low
+
+  * Initial upload
+  * Git: slp-source.sec.samsung.net:slp/api/common
+  * Tag: capi-base-common_0.0.1-1
+
+ -- Woongsuk Cho <ws77.cho@samsung.com>  Thu, 04 Aug 2011 14:09:17 +0900
+
