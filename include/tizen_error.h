@@ -20,12 +20,12 @@
 
 #include <errno.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
- * @defgroup CAPI_COMMON_ERROR Common Error Code
- * @brief This file provides error codes that are common for the whole TIZEN API.
- * @section CAPI_COMMON_ERROR_HEADER Required Header
- *   \#include <tizen_error.h>
- * @ingroup CAPI_BASE_FRAMEWORK
+ * @addtogroup CAPI_COMMON_ERROR
  * @{
  */
 
@@ -34,54 +34,189 @@
 #define TIZEN_ERROR_MAX_PLATFORM_ERROR 0
 #define TIZEN_ERROR_MIN_PLATFORM_ERROR (-1073741824LL) /* = -2147483648 / 2 */
 
-/** Use this constant macro as the value of the first module specific error */
+/* Use this constant macro as the value of the first module specific error */
 #define TIZEN_ERROR_MIN_MODULE_ERROR (-2147483648LL)
 
-/** Module errors cannot be greater than the following constant */
+/* Module errors cannot be greater than the following constant */
 #define TIZEN_ERROR_MAX_MODULE_ERROR (TIZEN_ERROR_MIN_PLATFORM_ERROR - 1)
 
-/** Check if error or not */
+/* Check if error or not */
 #define TIZEN_ERROR_IS_OK(x) (0 <= (x))
 
-/** Check if error or not */
+/* Check if error or not */
 #define TIZEN_ERROR_IS_ERROR(x) (!TIZEN_ERROR_IS_OK(x))
 
-/** Check if slp error or not */
+/* Check if slp error or not */
 #define TIZEN_ERROR_IS_PLATFORM_ERROR(x) (TIZEN_ERROR_MIN_PLATFORM_ERROR <= (x) && (x) < 0)
 
-/** Application Error Class */
+/* Application Error Class */
 #define TIZEN_ERROR_APPLICATION_CLASS -0x00000200
-/** Base Error Class */
+/* Base Error Class */
 #define TIZEN_ERROR_BASE_CLASS -0x00000400
-/** Content Error Class */
+/* Content Error Class */
 #define TIZEN_ERROR_CONTENT_CLASS -0x00000800
-/** Location Error Class */
+/* Location Error Class */
 #define TIZEN_ERROR_LOCATION_CLASS -0x00001000
-/** Multimedia Error Class */
+/* Multimedia Error Class */
 #define TIZEN_ERROR_MULTIMEDIA_CLASS -0x00002000
-/** Messaging Error Class */
+/* Messaging Error Class */
 #define TIZEN_ERROR_MESSAGING_CLASS -0x00004000
-/** Network Error Class */
+/* Network Error Class */
 #define TIZEN_ERROR_NETWORK_CLASS -0x00008000
-/** Social Error Class */
+/* Social Error Class */
 #define TIZEN_ERROR_SOCIAL_CLASS -0x00010000
-/** System Error Class */
+/* System Error Class */
 #define TIZEN_ERROR_SYSTEM_CLASS -0x00020000
-/** Telephony Error Class */
+/* Telephony Error Class */
 #define TIZEN_ERROR_TELEPHONY_CLASS -0x00040000
-/** UI Error class */
+/* UI Error class */
 #define TIZEN_ERROR_UI_CLASS -0x00080000
-/** UIX Error class */
+/* UIX Error class */
 #define TIZEN_ERROR_UIX_CLASS -0x00100000
-/** AD Error class */
+/* AD Error class */
 #define TIZEN_ERROR_AD_CLASS -0x00200000
-/** Web Error class */
+/* Web Error class */
 #define TIZEN_ERROR_WEB_CLASS -0x00400000
-/** DRM Error class */
+/* DRM Error class */
 #define TIZEN_ERROR_DRM_CLASS -0x00800000
-/** Account Error class */
+/* Account Error class */
 #define TIZEN_ERROR_ACCOUNT_CLASS -0x01000000
 
+/* Tizen Account Error */
+#define TIZEN_ERROR_ACCOUNT             -0x01000000
+/* Tizen Application Error */
+#define TIZEN_ERROR_APPLICATION         -0x01100000
+/* Tizen Application Manager Error */
+#define TIZEN_ERROR_APPLICATION_MANAGER -0x01110000
+/* Tizen Badge Error */
+#define TIZEN_ERROR_BADGE               -0x01120000
+/* Tizen Message Port Error */
+#define TIZEN_ERROR_MESSAGE_PORT        -0x01130000
+/* Tizen Notification Error */
+#define TIZEN_ERROR_NOTIFICATION        -0x01140000
+/* Tizen Package Manager Error */
+#define TIZEN_ERROR_PACKAGE_MANAGER	-0x01150000
+/* Tizen Shortcut Error */
+#define TIZEN_ERROR_SHORTCUT		-0x01160000
+/* Tizen UI Gadget Error */
+#define TIZEN_ERROR_UI_GADGET		-0x01170000
+/* Tizen Bundle Error */
+#define TIZEN_ERROR_BUNDLE		-0x01180000
+/* Tizen Data Control Error */
+#define TIZEN_ERROR_DATA_CONTROL        -0x01190000
+/* Tizen Service Application Error */
+#define TIZEN_ERROR_SERVICE_APPLICATION  -0x01200000
+/* Tizen Utility ICU Error */
+#define TIZEN_ERROR_UTILITY_ICU		-0x01500000
+/* Tizen Mime Type Error */
+#define TIZEN_ERROR_MIME_TYPE		-0x01600000
+/* Tizen Media Content Error */
+#define TIZEN_ERROR_MEDIA_CONTENT	-0x01610000
+/* Tizen Email Service Error */
+#define TIZEN_ERROR_EMAIL_SERVICE	-0x01700000
+/* Tizen Messaging Service Error */
+#define TIZEN_ERROR_MESSAGING_SERVICE	-0x01710000
+/* Tizen Push Error */
+#define TIZEN_ERROR_PUSH		-0x01720000
+/* Tizen Audio IO Error */
+#define TIZEN_ERROR_AUDIO_IO		-0x01900000
+/* Tizen Camera Error */
+#define TIZEN_ERROR_CAMERA		-0x01910000
+/* Tizen Image Util Error */
+#define TIZEN_ERROR_IMAGE_UTIL		-0x01920000
+/* Tizen Metadata Extractor Error */
+#define TIZEN_ERROR_METADATA_EXTRACTOR	-0x01930000
+/* Tizen Player Error */
+#define TIZEN_ERROR_PLAYER		-0x01940000
+/* Tizen Recorder Error */
+#define TIZEN_ERROR_RECORDER		-0x01950000
+/* Tizen Sound Manager Error */
+#define TIZEN_ERROR_SOUND_MANAGER	-0x01960000
+/* Tizen Tone Player Error */
+#define TIZEN_ERROR_TONE_PLAYER		-0x01970000
+/* Tizen Video Util Error */
+#define TIZEN_ERROR_VIDEO_UTIL		-0x01980000
+/* Tizen Wav Player Error */
+#define TIZEN_ERROR_WAV_PLAYER		-0x01990000
+/* Tizen Radio Error */
+#define TIZEN_ERROR_RADIO	        -0x019A0000
+/* Tizen MEDIA CODEC Error */
+#define TIZEN_ERROR_MEDIACODEC         -0x019B0000
+/* Tizen Bluetooth Error */
+#define TIZEN_ERROR_BLUETOOTH		-0x01C00000
+/* Tizen Connection Error */
+#define TIZEN_ERROR_CONNECTION		-0x01C10000
+/* Tizen NFC Error */
+#define TIZEN_ERROR_NFC			-0x01C20000
+/* Tizen Serial Error */
+#define TIZEN_ERROR_SERIAL		-0x01C30000
+/* Tizen Tethering Error */
+#define TIZEN_ERROR_TETHERING		-0x01C40000
+/* Tizen Wifi Error */
+#define TIZEN_ERROR_WIFI		-0x01C50000
+/* Tizen Wifi Direct Error */
+#define TIZEN_ERROR_WIFI_DIRECT		-0x01C60000
+/* Tizen Privacy Manager Error */
+#define TIZEN_ERROR_PRIVACY_MANAGER	-0x01E00000
+/* Tizen Key Manager Error */
+#define TIZEN_ERROR_KEY_MANAGER		-0x01E10000
+/* Tizen PRIVILEGE INFO Error */
+#define TIZEN_ERROR_PRIVILEGE_INFORMATION -0x01E20000
+/* Tizen Calendar Error */
+#define TIZEN_ERROR_CALENDAR		-0x02000000
+/* Tizen Contacts Error */
+#define TIZEN_ERROR_CONTACTS		-0x02010000
+/* Tizen Storage Error */
+#define TIZEN_ERROR_STORAGE		-0x02200000
+/* Tizen Vconf Error */
+#define TIZEN_ERROR_VCONF		-0x02210000
+/* Tizen Device Error */
+#define TIZEN_ERROR_DEVICE		-0x02400000
+/* Tizen Dlog Error */
+#define TIZEN_ERROR_DLOG		-0x02410000
+/* Tizen Media Key Error */
+#define TIZEN_ERROR_MEDIA_KEY		-0x02420000
+/* Tizen Runetime Info Error */
+#define TIZEN_ERROR_RUNTIME_INFORMATION	-0x02430000
+/* Tizen Sensor Error */
+#define TIZEN_ERROR_SENSOR		-0x02440000
+/* Tizen System Info Error */
+#define TIZEN_ERROR_SYSTEM_INFORMATION	-0x02450000
+/* Tizen System Setting Error */
+#define TIZEN_ERROR_SYSTEM_SETTING	-0x02460000
+/* Tizen System Resource Error */
+#define TIZEN_ERROR_SYSTEM_RESOURCE	-0x02470000
+/* Tizen Context Error */
+#define TIZEN_ERROR_CONTEXT		-0x02480000
+/* Tizen Telephony Error */
+#define TIZEN_ERROR_TELEPHONY		-0x02600000
+/* Tizen EFL Util Error */
+#define TIZEN_ERROR_EFL_UTIL		-0x02800000
+/* Tizen UtilX Error */
+#define TIZEN_ERROR_UTILX		-0x02810000
+/* Tizen Native Buffer Error */
+#define TIZEN_ERROR_NATIVE_BUFFER	-0x02820000
+/* Tizen Buffer Manager Error */
+#define TIZEN_ERROR_TBM			-0x02830000
+/* Tizen Download Error */
+#define TIZEN_ERROR_DOWNLOAD		-0x02A00000
+/* Tizen WebView Error */
+#define TIZEN_ERROR_WEBVIEW		-0x02A10000
+/* Tizen Location Manager */
+#define TIZEN_ERROR_LOCATION_MANAGER	-0x02C00000
+/* Tizen STT Error */
+#define TIZEN_ERROR_STT			-0x02F00000
+/* Tizen TTS Error */
+#define TIZEN_ERROR_TTS			-0x02F10000
+
+
+
+
+/**
+ * @brief Enumeration for tizen errors.
+ * @since_tizen 2.3
+ *
+*/
 typedef enum
 {
     TIZEN_ERROR_NONE = 0, /**< Successful */
@@ -181,20 +316,60 @@ typedef enum
 
     TIZEN_ERROR_OWNER_DEAD = -EOWNERDEAD, /**< Owner died (for robust mutexes) */
 
-    /** Different errors (not an errno) */
-    TIZEN_ERROR_UNKNOWN = TIZEN_ERROR_MIN_PLATFORM_ERROR,
+    TIZEN_ERROR_UNKNOWN = TIZEN_ERROR_MIN_PLATFORM_ERROR, /**< Unknown error */
 
     /* This is a place to add new errors here.
      * Do not assign integer values explicitly. Values are auto-assigned.
      */
-    TIZEN_ERROR_TIMED_OUT,
-    TIZEN_ERROR_NOT_SUPPORT_API,
-    TIZEN_ERROR_END_OF_COLLECTION,
-
+    TIZEN_ERROR_TIMED_OUT, /**< Time out */
+    TIZEN_ERROR_NOT_SUPPORTED, /**< Not supported */
+    TIZEN_ERROR_USER_NOT_CONSENTED, /**< Not Consented */
+    TIZEN_ERROR_END_OF_COLLECTION
 } tizen_error_e;
+
+
+/**
+ * @brief Gets the last error code in the thread.
+ * @since_tizen 2.3
+ *
+ * @details This function retrieves the last error code which is set by set_last_result()
+ *
+ * @return One of #tizen_error_e 
+ *
+ * @see #tizen_error_e
+ * @see set_last_result()
+*/
+int get_last_result(void);
+
+/**
+ * @brief Sets the last error code to be returned in the thread.
+ * @since_tizen 2.3
+ *
+ * @param[in] err The error code to be returned
+ *
+ * @see #tizen_error_e
+ * @see get_last_result()
+*/
+void set_last_result(int err);
+
+/**
+ * @brief Gets the message for given the error code.
+ * @since_tizen 2.3
+ *
+ * @remark This function returns a static pointer; subsequent calls will overwrite it.
+ * @param[in] err The error value to be returned
+ * @return The error's message
+ *
+ * @see #tizen_error_e
+ */
+char* get_error_message(int err);
 
 /**
  * @}
  */
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif         /**<__TIZEN_COMMON_ERROR_H__ */
