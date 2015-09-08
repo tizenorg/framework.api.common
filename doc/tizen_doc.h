@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-#ifndef __TIZEN_H__
-#define __TIZEN_H__
 
-#include <tizen_type.h>
-#include <tizen_error.h>
 
-#ifndef EXPORT_API
-#define EXPORT_API __attribute__((__visibility__("default")))
-#endif
-#endif // __TIZEN_H__
+
+/**
+ * @defgroup CAPI_COMMON_ERROR Common Error
+ * @brief This file provides error codes that are common for the whole TIZEN API.
+ * @section CAPI_COMMON_ERROR_HEADER Required Header
+ *  \#include <tizen.h>
+ * @ingroup CAPI_BASE_FRAMEWORK
+ * @section CAPI_COMMON_ERROR_OVERVIEW Overview
+ * This file declares common errors and provides following features for handling the error.
+ * - Getting/Setting the error value.
+ * - Retrieving the error messages with error value. 
+ */
+

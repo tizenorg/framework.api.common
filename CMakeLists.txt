@@ -1,16 +1,30 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT("capi-base-common")
-
+SET(fw_name "capi-base-common")
 SET(CMAKE_INSTALL_PREFIX "/usr")
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
-SET(VERSION 0.0.1)
+SET(VERSION ${FULLVER})
+SET(PC_LDFLAGS -l${fw_name})
 
-INSTALL(FILES include/tizen.h DESTINATION include)
-INSTALL(FILES include/tizen_error.h DESTINATION include)
-INSTALL(FILES include/tizen_type.h DESTINATION include)
+SET(INC_DIR "include")
+
+INSTALL(FILES ${INC_DIR}/tizen.h DESTINATION include)
+INSTALL(FILES ${INC_DIR}/tizen_type.h DESTINATION include)
+INSTALL(FILES ${INC_DIR}/tizen_error.h DESTINATION include)
+INCLUDE_DIRECTORIES(${INC_DIR})
 
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/capi-base-common.pc DESTINATION lib/pkgconfig)
+
+SET(SOURCES
+        src/tizen_error.c
+)
+
+ADD_LIBRARY(${fw_name} SHARED ${SOURCES})
+SET_TARGET_PROPERTIES(${fw_name} PROPERTIES VERSION ${FULLVER})
+SET_TARGET_PROPERTIES(${fw_name} PROPERTIES SOVERSION 0)
+INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR})
+CONFIGURE_FILE(${fw_name}.pc.in ${fw_name}.pc @ONLY)
 
 IF(UNIX)
 

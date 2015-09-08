@@ -1,0 +1,546 @@
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
+
+
+#include <stdlib.h>
+#include <string.h>
+#include "tizen.h"
+
+/* END of Tizen Platoform Error */
+#define TIZEN_ERROR_MIN_PLATFORM_MODULE -0x0FFFFFFF
+
+#define ERR_ENTRY(name, value, msg)	{value, name, msg}
+
+typedef struct tizen_err_info
+{
+	int value;
+	const char *name;
+	const char *msg;
+}err_info;
+
+static err_info err_list[] =
+{
+	ERR_ENTRY("TIZEN_ERROR_UNKNOWN",TIZEN_ERROR_UNKNOWN,"Unknown error"),
+	ERR_ENTRY("TIZEN_ERROR_TIMED_OUT",TIZEN_ERROR_TIMED_OUT,"Time out"),
+	ERR_ENTRY("TIZEN_ERROR_NOT_SUPPORTED",TIZEN_ERROR_NOT_SUPPORTED,"Not supported"),
+	ERR_ENTRY("TIZEN_ERROR_USER_NOT_CONSENTED",TIZEN_ERROR_USER_NOT_CONSENTED,"Not consented"),
+#if defined (TIZEN_ERROR_ACCOUNT)
+	ERR_ENTRY("ACCOUNT_ERROR_DUPLICATED",TIZEN_ERROR_ACCOUNT | 0x01,"Same user name exists in your application"),
+	ERR_ENTRY("ACCOUNT_ERROR_RECORD_NOT_FOUND",TIZEN_ERROR_ACCOUNT | 0x03,"Related record does not exist"),
+	ERR_ENTRY("ACCOUNT_ERROR_DB_FAILED",TIZEN_ERROR_ACCOUNT | 0x04,"DB operation failed"),
+	ERR_ENTRY("ACCOUNT_ERROR_DB_NOT_OPENED",TIZEN_ERROR_ACCOUNT | 0x05,"DB is not connected"),
+	ERR_ENTRY("ACCOUNT_ERROR_QUERY_SYNTAX_ERROR",TIZEN_ERROR_ACCOUNT | 0x06,"DB query syntax error"),
+	ERR_ENTRY("ACCOUNT_ERROR_ITERATOR_END",TIZEN_ERROR_ACCOUNT | 0x07,"Iterator has reached the end"),
+	ERR_ENTRY("ACCOUNT_ERROR_NOTI_FAILED",TIZEN_ERROR_ACCOUNT | 0x08,"Notification failed"),
+	ERR_ENTRY("ACCOUNT_ERROR_XML_PARSE_FAILED",TIZEN_ERROR_ACCOUNT | 0x0a,"XML parse failed"),
+	ERR_ENTRY("ACCOUNT_ERROR_XML_FILE_NOT_FOUND",TIZEN_ERROR_ACCOUNT | 0x0b,"XML file does not exist "),
+	ERR_ENTRY("ACCOUNT_ERROR_EVENT_SUBSCRIPTION_FAIL",TIZEN_ERROR_ACCOUNT | 0x0c,"Subscription failed "),
+	ERR_ENTRY("ACCOUNT_ERROR_NOT_REGISTERED_PROVIDER",TIZEN_ERROR_ACCOUNT | 0x0d,"Account provider is not registered"),
+	ERR_ENTRY("ACCOUNT_ERROR_NOT_ALLOW_MULTIPLE",TIZEN_ERROR_ACCOUNT | 0x0e,"Multiple accounts are not supported"),
+	ERR_ENTRY("ACCOUNT_ERROR_DATABASE_BUSY",TIZEN_ERROR_ACCOUNT | 0x10,"SQLite busy handler expired"),
+#endif
+#if defined (TIZEN_ERROR_APPLICATION)
+	ERR_ENTRY("APP_ERROR_INVALID_CONTEXT",TIZEN_ERROR_APPLICATION | 0x01,"Invalid application context"),
+	ERR_ENTRY("ALARM_ERROR_INVALID_TIME",TIZEN_ERROR_APPLICATION | 0x05,"Invalid time"),
+	ERR_ENTRY("ALARM_ERROR_INVALID_DATE",TIZEN_ERROR_APPLICATION | 0x06,"Invalid date"),
+	ERR_ENTRY("ALARM_ERROR_CONNECTION_FAIL",TIZEN_ERROR_APPLICATION | 0x07,"The alarm service connection failed"),	
+	ERR_ENTRY("APP_CONTROL_ERROR_APP_NOT_FOUND",TIZEN_ERROR_APPLICATION | 0x21,"The application is not found"),
+	ERR_ENTRY("APP_CONTROL_ERROR_INVALID_DATA_TYPE",TIZEN_ERROR_APPLICATION | 0x22,"Invalid data type"),
+	ERR_ENTRY("APP_CONTROL_ERROR_LAUNCH_REJECTED",TIZEN_ERROR_APPLICATION | 0x23,"The application cannot be launched now"),
+	ERR_ENTRY("APP_CONTROL_ERROR_LAUNCH_FAILED",TIZEN_ERROR_APPLICATION | 0x24,"Internal launch error"),
+	ERR_ENTRY("PREFERENCE_ERROR_NO_KEY",TIZEN_ERROR_APPLICATION | 0x30,"Required key not available"),	
+#endif
+#if defined (TIZEN_ERROR_APPLICATION_MANAGER)
+	ERR_ENTRY("APP_MANAGER_ERROR_NO_SUCH_APP",TIZEN_ERROR_APPLICATION_MANAGER | 0x01 ,"No such application"),
+	ERR_ENTRY("APP_MANAGER_ERROR_DB_FAILED",TIZEN_ERROR_APPLICATION_MANAGER | 0x03 ,"Database error"),
+	ERR_ENTRY("APP_MANAGER_ERROR_INVALID_PACKAGE",TIZEN_ERROR_APPLICATION_MANAGER | 0x04 ,"Invalid package name"),
+	ERR_ENTRY("APP_MANAGER_ERROR_APP_NO_RUNNING",TIZEN_ERROR_APPLICATION_MANAGER | 0x05 ,"App is not running"),
+	ERR_ENTRY("APP_MANAGER_ERROR_REQUEST_FAILED",TIZEN_ERROR_APPLICATION_MANAGER | 0x06 ,"Internal aul request error"),
+#endif
+#if defined (TIZEN_ERROR_BADGE)
+	ERR_ENTRY("BADGE_ERROR_FROM_DB",TIZEN_ERROR_BADGE | 0x01 ,"Error from DB"),
+	ERR_ENTRY("BADGE_ERROR_ALREADY_EXIST",TIZEN_ERROR_BADGE | 0x02 ,"Already exist"),
+	ERR_ENTRY("BADGE_ERROR_FROM_DBUS",TIZEN_ERROR_BADGE | 0x03 ,"Error from DBus"),
+	ERR_ENTRY("BADGE_ERROR_NOT_EXIST",TIZEN_ERROR_BADGE | 0x04 ,"Not exist"),
+	ERR_ENTRY("BADGE_ERROR_SERVICE_NOT_READY",TIZEN_ERROR_BADGE | 0x05 ,"Error service not ready"),
+#endif
+#if defined (TIZEN_ERROR_MESSAGE_PORT)
+	ERR_ENTRY("MESSAGE_PORT_ERROR_PORT_NOT_FOUND",TIZEN_ERROR_MESSAGE_PORT | 0x01 ,"The message port of the remote application is not found"),
+	ERR_ENTRY("MESSAGE_PORT_ERROR_CERTIFICATE_NOT_MATCH",TIZEN_ERROR_MESSAGE_PORT | 0x02 ,"The remote application is not signed with the same certificate"),
+	ERR_ENTRY("MESSAGE_PORT_ERROR_MAX_EXCEEDED",TIZEN_ERROR_MESSAGE_PORT | 0x03 ,"The size of the message has exceeded the maximum limit"),
+	ERR_ENTRY("MESSAGE_PORT_ERROR_RESOURCE_UNAVAILABLE",TIZEN_ERROR_MESSAGE_PORT | 0x04 ,"Resource is temporarily unavailable"),
+#endif
+#if defined (TIZEN_ERROR_NOTIFICATION)
+	ERR_ENTRY("NOTIFICATION_ERROR_FROM_DB",TIZEN_ERROR_NOTIFICATION | 0x01 ,"Error from DB"),
+	ERR_ENTRY("NOTIFICATION_ERROR_ALREADY_EXIST_ID",TIZEN_ERROR_NOTIFICATION | 0x02 ,"Already exist private ID"),
+	ERR_ENTRY("NOTIFICATION_ERROR_FROM_DBUS",TIZEN_ERROR_NOTIFICATION | 0x03 ,"Error from DBus"),
+	ERR_ENTRY("NOTIFICATION_ERROR_NOT_EXIST_ID",TIZEN_ERROR_NOTIFICATION | 0x04 ,"Not exist private ID "),
+	ERR_ENTRY("NOTIFICATION_ERROR_SERVICE_NOT_READY",TIZEN_ERROR_NOTIFICATION | 0x05 ,"No reponse from notification service"),
+#endif
+
+#if defined (TIZEN_ERROR_PACKAGE_MANAGER)
+	ERR_ENTRY("PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE",TIZEN_ERROR_PACKAGE_MANAGER | 0x71 ,"No such package"),
+	ERR_ENTRY("PACKAGE_MANAGER_ERROR_SYSTEM_ERROR",TIZEN_ERROR_PACKAGE_MANAGER | 0x72 ,"Severe system error "),
+#endif
+
+#if defined (TIZEN_ERROR_SHORTCUT)
+	ERR_ENTRY("SHORTCUT_ERROR_NO_SPACE", TIZEN_ERROR_SHORTCUT | 0x0001 ,"There is no space to add a new shortcut"),
+	ERR_ENTRY("SHORTCUT_ERROR_EXIST", TIZEN_ERROR_SHORTCUT | 0x0002,"Shortcut is already added"),
+	ERR_ENTRY("SHORTCUT_ERROR_FAULT", TIZEN_ERROR_SHORTCUT | 0x0004, "Failed to add a shortcut. Unrecoverable error"),
+	ERR_ENTRY("SHORTCUT_ERROR_COMM", TIZEN_ERROR_SHORTCUT | 0x0040 ,"Connection is not established. or there is a problem in the communication"),
+#endif
+#if defined (TIZEN_ERROR_BUNDLE)
+	ERR_ENTRY("BUNDLE_ERROR_KEY_EXISTS", TIZEN_ERROR_BUNDLE | 0x01 ,"Key exists"),
+#endif
+#if defined (TIZEN_ERROR_DATA_CONTROL)
+	ERR_ENTRY("DATA_CONTROL_ERROR_MAX_EXCEEDED",TIZEN_ERROR_DATA_CONTROL | 0x01 ,"Too long argument"),
+#endif
+#if defined (TIZEN_ERROR_SERVICE_APPLICATION)
+#endif
+#if defined (TIZEN_ERROR_UTILITY_ICU)
+	ERR_ENTRY("I18N_ERROR_MISSING_RESOURCE", TIZEN_ERROR_UTILITY_ICU | 0x01 ,"The requested resource cannot be found"),
+	ERR_ENTRY("I18N_ERROR_INVALID_FORMAT", TIZEN_ERROR_UTILITY_ICU | 0x02 ,"Data format is not what is expected "),
+	ERR_ENTRY("I18N_ERROR_FILE_ACCESS", TIZEN_ERROR_UTILITY_ICU | 0x03 ,"The requested file cannot be found"),
+	ERR_ENTRY("I18N_ERROR_INTERNAL_PROGRAM", TIZEN_ERROR_UTILITY_ICU | 0x04 ,"Indicates a bug in the library code"),
+	ERR_ENTRY("I18N_ERROR_INDEX_OUTOFBOUNDS", TIZEN_ERROR_UTILITY_ICU | 0x05 ,"Trying to access the index that is out of bounds"),
+	ERR_ENTRY("I18N_ERROR_INVALID_CHAR_FOUND", TIZEN_ERROR_UTILITY_ICU | 0x6 ,"Character conversion: Unmappable input sequence. In other APIs: Invalid character"),
+	ERR_ENTRY("I18N_ERROR_BUFFER_OVERFLOW", TIZEN_ERROR_UTILITY_ICU | 0x07 ,"A result would not fit in the supplied buffer"),
+	ERR_ENTRY("I18N_ERROR_COLLATOR_VERSION_MISMATCH", TIZEN_ERROR_UTILITY_ICU | 0x08 ,"Collator version is not compatible with the base version"),
+	ERR_ENTRY("I18N_ERROR_USELESS_COLLATOR", TIZEN_ERROR_UTILITY_ICU | 0x09 ,"Collator is options only and no base is specified"),
+	ERR_ENTRY("I18N_ERROR_NO_WRITE_PERMISSION", TIZEN_ERROR_UTILITY_ICU | 0x0A ,"Attempt to modify read-only or constant data"),
+	ERR_ENTRY("I18N_ERROR_RESOURCE_TYPE_MISMATCH", TIZEN_ERROR_UTILITY_ICU | 0x0B ,"An operation is requested over a resource that does not support it"),
+	ERR_ENTRY("I18N_ERROR_TOO_MANY_ALIASES", TIZEN_ERROR_UTILITY_ICU | 0x0C ,"Too many aliases in the path to the requested resource"),
+	
+	ERR_ENTRY("I18N_ERROR_MESSAGE_PARSE", TIZEN_ERROR_UTILITY_ICU | 0x0D ,"Unable to parse a message (message format)"),
+	ERR_ENTRY("I18N_ERROR_PARSE", TIZEN_ERROR_UTILITY_ICU | 0x0E ,"Equivalent to Java ParseException"),
+	ERR_ENTRY("I18N_ERROR_TRUNCATED_CHAR_FOUND", TIZEN_ERROR_UTILITY_ICU | 0x0F ,"Character conversion: Incomplete input sequence"),
+	ERR_ENTRY("I18N_ERROR_ILLEGAL_CHAR_FOUND", TIZEN_ERROR_UTILITY_ICU | 0x10 ,"Character conversion: Illegal input sequence/combination of input units"),
+	ERR_ENTRY("I18N_ERROR_INVALID_TABLE_FORMAT", TIZEN_ERROR_UTILITY_ICU | 0x11 ,"Conversion table file found, but corrupted"),
+	ERR_ENTRY("I18N_ERROR_INVALID_TABLE_FILE", TIZEN_ERROR_UTILITY_ICU | 0x12 ,"Conversion table file not found"),
+	ERR_ENTRY("I18N_ERROR_ILLECAL_ESCAPE_SEQUENCE", TIZEN_ERROR_UTILITY_ICU | 0x13 ,"ISO-2022 illlegal escape sequence"),
+	ERR_ENTRY("I18N_ERROR_UNSUPPORTED_ESCAPE_SEQUENCE", TIZEN_ERROR_UTILITY_ICU | 0x14 ,"ISO-2022 unsupported escape sequence"),	
+	ERR_ENTRY("I18N_ERROR_NO_SPACE_AVAILABLE", TIZEN_ERROR_UTILITY_ICU | 0x15 ,"No space available for in-buffer expansion for Arabic shaping"),
+	ERR_ENTRY("I18N_ERROR_CE_NOT_FOUND", TIZEN_ERROR_UTILITY_ICU | 0x16 ,"Currently used only while setting variable top, but can be used generally"),
+	ERR_ENTRY("I18N_ERROR_PRIMARY_TOO_LONG", TIZEN_ERROR_UTILITY_ICU | 0x17 ,"User tried to set variable top to a primary that is longer than two bytes"),
+	ERR_ENTRY("I18N_ERROR_STATE_TOO_OLD", TIZEN_ERROR_UTILITY_ICU | 0x18 ,"ICU cannot construct a service from this state, as it is no longer supported"),
+	ERR_ENTRY("I18N_ERROR_ENUM_OUT_OF_SYNC", TIZEN_ERROR_UTILITY_ICU | 0x19 ,"UEnumeration out of sync with underlying collection"),
+	ERR_ENTRY("I18N_ERROR_INVARIANT_CONVERSION", TIZEN_ERROR_UTILITY_ICU | 0x1A ,"Unable to convert a UChar* string to char* with the invariant converter"),
+	ERR_ENTRY("I18N_ERROR_INVALID_STATE", TIZEN_ERROR_UTILITY_ICU | 0x1B ,"Requested operation can not be completed with ICU in its current state"),
+	ERR_ENTRY("I18N_ERROR_MALFORMED_SET", TIZEN_ERROR_UTILITY_ICU | 0x1C ,"A UnicodeSet pattern is invalid. @if MOBILE"),
+	ERR_ENTRY("I18N_WARNING_STRING_NOT_TERMINATED", TIZEN_ERROR_UTILITY_ICU | 0x1D ,"String not terminated with NULL. @if MOBILE"),
+	ERR_ENTRY("I18N_ERROR_STD3_ASCII_RULES", TIZEN_ERROR_UTILITY_ICU | 0x1E ,"Argument does not satisfy STD3 rules"),
+	ERR_ENTRY("I18N_ERROR_UNASSIGNED", TIZEN_ERROR_UTILITY_ICU | 0x1F ,"Unassigned code points are found"),
+	ERR_ENTRY("I18N_WARNING_SORT_KEY_TOO_SHORT", TIZEN_ERROR_UTILITY_ICU | 0x20 ,"Number of levels requested in getBound is higher than the number of levels in the sort key"),
+
+#endif
+#if defined (TIZEN_ERROR_MIME_TYPE)
+#endif
+#if defined (TIZEN_ERROR_MEDIA_CONTENT)
+	ERR_ENTRY("MEDIA_CONTENT_ERROR_DB_FAILED", TIZEN_ERROR_MEDIA_CONTENT | 0x01 ,"DB operation failed "),
+	ERR_ENTRY("MEDIA_CONTENT_ERROR_DB_BUSY", TIZEN_ERROR_MEDIA_CONTENT | 0x02 ,"DB operation BUSY"),
+	ERR_ENTRY("MEDIA_CONTENT_ERROR_NETWORK", TIZEN_ERROR_MEDIA_CONTENT | 0x03 ,"Network Fail"),
+	ERR_ENTRY("MEDIA_CONTENT_ERROR_UNSUPPORTED_CONTENT", TIZEN_ERROR_MEDIA_CONTENT | 0x04 ,"Unsupported content "),
+#endif
+#if defined (TIZEN_ERROR_EMAIL_SERVICE)
+	ERR_ENTRY("EMAILS_ERROR_SERVER_NOT_READY", TIZEN_ERROR_EMAIL_SERVICE | 0x200 ,"Server not ready"),
+	ERR_ENTRY("EMAILS_ERROR_COMMUNICATION_WITH_SERVER_FAILED", TIZEN_ERROR_EMAIL_SERVICE | 0x201 ,"Communication with server failed"),
+	ERR_ENTRY("EMAILS_ERROR_OPERATION_FAILED", TIZEN_ERROR_EMAIL_SERVICE | 0x202 ,"Operation failed"),
+	ERR_ENTRY("EMAILS_ERROR_ACCOUNT_NOT_FOUND", TIZEN_ERROR_EMAIL_SERVICE | 0x203 ,"Email account not found"),
+	ERR_ENTRY("EMAILS_ERROR_DB_FAILED", TIZEN_ERROR_EMAIL_SERVICE | 0x204 ,"Email database failed"),
+#endif
+#if defined (TIZEN_ERROR_MESSAGING_SERVICE)
+	ERR_ENTRY("MESSAGES_ERROR_SERVER_NOT_READY", TIZEN_ERROR_MESSAGING_SERVICE | 0x501 ,"Server is not read"),
+	ERR_ENTRY("MESSAGES_ERROR_COMMUNICATION_WITH_SERVER_FAILED", TIZEN_ERROR_MESSAGING_SERVICE | 0x502 ,"Communication with server failed"),
+	ERR_ENTRY("MESSAGES_ERROR_OUT_OF_RANGE", TIZEN_ERROR_MESSAGING_SERVICE | 0x503 ,"Index out of range"),
+	ERR_ENTRY("MESSAGES_ERROR_SENDING_FAILED", TIZEN_ERROR_MESSAGING_SERVICE | 0x504 ,"Sending a message failed"),
+	ERR_ENTRY("MESSAGES_ERROR_OPERATION_FAILED", TIZEN_ERROR_MESSAGING_SERVICE | 0x505 ,"Messaging operation failed"),
+	ERR_ENTRY("MESSAGES_ERROR_NO_SIM_CARD", TIZEN_ERROR_MESSAGING_SERVICE | 0x506 ,"No SIM Card"),
+	ERR_ENTRY("MESSAGES_ERROR_NO_DATA", TIZEN_ERROR_MESSAGING_SERVICE | 0x507 ,"No data available"),
+#endif
+#if defined (TIZEN_ERROR_PUSH)
+#endif
+#if defined (TIZEN_ERROR_AUDIO_IO)
+	ERR_ENTRY("AUDIO_IO_ERROR_DEVICE_NOT_OPENED", TIZEN_ERROR_AUDIO_IO | 0x01 ,"Device open error"),
+	ERR_ENTRY("AUDIO_IO_ERROR_DEVICE_NOT_CLOSED", TIZEN_ERROR_AUDIO_IO | 0x02 ,"Device close error"),
+	ERR_ENTRY("AUDIO_IO_ERROR_INVALID_BUFFER", TIZEN_ERROR_AUDIO_IO | 0x03 ,"Invalid buffer pointer"),
+	ERR_ENTRY("AUDIO_IO_ERROR_SOUND_POLICY", TIZEN_ERROR_AUDIO_IO | 0x04 ,"Sound policy error"),
+#endif
+#if defined (TIZEN_ERROR_CAMERA)
+	ERR_ENTRY("CAMERA_ERROR_INVALID_STATE", TIZEN_ERROR_CAMERA | 0x02 ,"Invalid state"),
+	ERR_ENTRY("CAMERA_ERROR_DEVICE", TIZEN_ERROR_CAMERA | 0x04 ,"Device error"),
+	ERR_ENTRY("CAMERA_ERROR_SOUND_POLICY", TIZEN_ERROR_CAMERA | 0x06 ,"Blocked by Audio Session Manager"),
+	ERR_ENTRY("CAMERA_ERROR_SECURITY_RESTRICTED", TIZEN_ERROR_CAMERA | 0x07 ,"Restricted by security system policy"),
+	ERR_ENTRY("CAMERA_ERROR_DEVICE_BUSY", TIZEN_ERROR_CAMERA | 0x08 ,"The device is using another application or working on some operation"),
+	ERR_ENTRY("CAMERA_ERROR_DEVICE_NOT_FOUND", TIZEN_ERROR_CAMERA | 0x09 ,"No camera device "),
+	ERR_ENTRY("CAMERA_ERROR_SOUND_POLICY_BY_CALL", TIZEN_ERROR_CAMERA | 0x0a ,"Blocked by Audio Session Manager - CALL"),
+	ERR_ENTRY("CAMERA_ERROR_SOUND_POLICY_BY_ALARM", TIZEN_ERROR_CAMERA | 0x0b ,"Blocked by Audio Session Manager - ALARM"),
+	ERR_ENTRY("CAMERA_ERROR_ESD", TIZEN_ERROR_CAMERA | 0x0c ,"ESD situation"),
+#endif
+#if defined (TIZEN_ERROR_IMAGE_UTIL)
+	ERR_ENTRY("IMAGE_UTIL_ERROR_NOT_SUPPORTED_FORMAT", TIZEN_ERROR_IMAGE_UTIL | 0x01 ,"Not supported format"),
+#endif
+#if defined (TIZEN_ERROR_METADATA_EXTRACTOR)
+	ERR_ENTRY("METADATA_EXTRACTOR_ERROR_OPERATION_FAILED", TIZEN_ERROR_METADATA_EXTRACTOR | 0x01 ,"Invalid internal operation"),
+#endif
+#if defined (TIZEN_ERROR_PLAYER)
+	ERR_ENTRY("PLAYER_ERROR_SEEK_FAILED", TIZEN_ERROR_PLAYER | 0x21 ,"Seek operation failure"),
+	ERR_ENTRY("PLAYER_ERROR_INVALID_STATE", TIZEN_ERROR_PLAYER | 0x22 ,"Invalid state"),
+	ERR_ENTRY("PLAYER_ERROR_NOT_SUPPORTED_FILE", TIZEN_ERROR_PLAYER | 0x23 ,"File format not supported"),
+	ERR_ENTRY("PLAYER_ERROR_INVALID_URI", TIZEN_ERROR_PLAYER | 0x24 ,"Invalid URI"),
+	ERR_ENTRY("PLAYER_ERROR_SOUND_POLICY", TIZEN_ERROR_PLAYER | 0x25 ,"Sound policy error "),
+	ERR_ENTRY("PLAYER_ERROR_CONNECTION_FAILED", TIZEN_ERROR_PLAYER | 0x26 ,"Streaming connection failed"),
+	ERR_ENTRY("PLAYER_ERROR_VIDEO_CAPTURE_FAILED", TIZEN_ERROR_PLAYER | 0x27 ,"Video capture failed"),
+	ERR_ENTRY("PLAYER_ERROR_DRM_EXPIRED", TIZEN_ERROR_PLAYER | 0x28 ,"Expired license"),
+	ERR_ENTRY("PLAYER_ERROR_DRM_NO_LICENSE", TIZEN_ERROR_PLAYER | 0x29 ,"No license "),
+	ERR_ENTRY("PLAYER_ERROR_DRM_FUTURE_USE", TIZEN_ERROR_PLAYER | 0x2a ,"License for future use"),
+	ERR_ENTRY("PLAYER_ERROR_DRM_NOT_PERMITTED", TIZEN_ERROR_PLAYER | 0x2b ,"Format not permitted"),
+	ERR_ENTRY("PLAYER_ERROR_RESOURCE_LIMIT", TIZEN_ERROR_PLAYER | 0x2c ,"Resource limit"),
+#endif
+#if defined (TIZEN_ERROR_RECORDER)
+	ERR_ENTRY("RECORDER_ERROR_INVALID_STATE", TIZEN_ERROR_RECORDER | 0x12 ,"Invalid state"),
+	ERR_ENTRY("RECORDER_ERROR_DEVICE", TIZEN_ERROR_RECORDER | 0x14 ,"Device error "),
+	ERR_ENTRY("RECORDER_ERROR_SOUND_POLICY", TIZEN_ERROR_RECORDER | 0x16 ,"Blocked by Audio Session Manager"),
+	ERR_ENTRY("RECORDER_ERROR_SECURITY_RESTRICTED", TIZEN_ERROR_RECORDER | 0x17 ,"Restricted by security system policy"),
+	ERR_ENTRY("RECORDER_ERROR_SOUND_POLICY_BY_CALL", TIZEN_ERROR_RECORDER | 0x18 ,"Blocked by Audio Session Manager - CALL"),
+	ERR_ENTRY("RECORDER_ERROR_SOUND_POLICY_BY_ALARM", TIZEN_ERROR_RECORDER | 0x19 ,"Blocked by Audio Session Manager - ALARM"),
+	ERR_ENTRY("RECORDER_ERROR_ESD", TIZEN_ERROR_RECORDER | 0x1a ,"ESD situation"),
+	ERR_ENTRY("RECORDER_ERROR_OUT_OF_STORAGE", TIZEN_ERROR_RECORDER | 0x1b ,"Out of storage"),
+#endif
+#if defined (TIZEN_ERROR_SOUND_MANAGER)
+
+	ERR_ENTRY("SOUND_MANAGER_ERROR_INTERNAL", TIZEN_ERROR_SOUND_MANAGER | 0x01 ,"Internal error inside the sound system"),
+	ERR_ENTRY("SOUND_MANAGER_ERROR_POLICY", TIZEN_ERROR_SOUND_MANAGER | 0x02 ,"Noncompliance with the sound system policy"),
+	ERR_ENTRY("SOUND_MANAGER_ERROR_NO_PLAYING_SOUND", TIZEN_ERROR_SOUND_MANAGER | 0x03 ,"No playing sound"),
+#endif
+#if defined (TIZEN_ERROR_TONE_PLAYER)
+#endif
+#if defined (TIZEN_ERROR_VIDEO_UTIL)
+	ERR_ENTRY("VIDEO_UTIL_ERROR_NOT_SUPPORTED_FORMAT",TIZEN_ERROR_VIDEO_UTIL | 0x01 ,"Not supported format"),
+#endif
+#if defined (TIZEN_ERROR_WAV_PLAYER)
+	ERR_ENTRY("WAV_PLAYER_ERROR_FORMAT_NOT_SUPPORTED", TIZEN_ERROR_WAV_PLAYER | 0x01 ,"Format not supported"),
+#endif
+#if defined (TIZEN_ERROR_RADIO)
+	ERR_ENTRY("RADIO_ERROR_INVALID_STATE", TIZEN_ERROR_RADIO | 0x01 ,"Invalid state"),
+	ERR_ENTRY("RADIO_ERROR_SOUND_POLICY", TIZEN_ERROR_RADIO | 0x02 ,"Sound policy error"),
+#endif
+#if defined (TIZEN_ERROR_MEDIACODEC)
+	ERR_ENTRY("MEDIACODEC_ERROR_INVALID_STATE", TIZEN_ERROR_MEDIACODEC | 0x01 ,"Invalid state"),
+	ERR_ENTRY("MEDIACODEC_ERROR_INVALID_INBUFFER", TIZEN_ERROR_MEDIACODEC | 0x02 ,"Invalid input buffer"),
+	ERR_ENTRY("MEDIACODEC_ERROR_INVALID_OUTBUFFER", TIZEN_ERROR_MEDIACODEC | 0x03 ,"Invalid output buffer"),
+	ERR_ENTRY("MEDIACODEC_ERROR_INTERNAL", TIZEN_ERROR_MEDIACODEC | 0x04 ,"Invalid output buffer"),
+	ERR_ENTRY("MEDIACODEC_ERROR_NOT_INITIALIZED", TIZEN_ERROR_MEDIACODEC | 0x05 ,"Internal error"),
+	ERR_ENTRY("MEDIACODEC_ERROR_INVALID_STREAM", TIZEN_ERROR_MEDIACODEC | 0x06 ,"Not initialized mediacodec"),
+	ERR_ENTRY("MEDIACODEC_ERROR_CODEC_NOT_FOUND", TIZEN_ERROR_MEDIACODEC | 0x07 ,"Cannot find codec"),
+	ERR_ENTRY("MEDIACODEC_ERROR_DECODE", TIZEN_ERROR_MEDIACODEC | 0x08 ,"Error while decoding data"),
+	ERR_ENTRY("MEDIACODEC_ERROR_NO_FREE_SPACE", TIZEN_ERROR_MEDIACODEC | 0x09 ,"Out of storage"),
+	ERR_ENTRY("MEDIACODEC_ERROR_STREAM_NOT_FOUND", TIZEN_ERROR_MEDIACODEC | 0x0a ,"Cannot find stream"),
+	ERR_ENTRY("MEDIACODEC_ERROR_NOT_SUPPORTED_FORMAT", TIZEN_ERROR_MEDIACODEC | 0x0b ,"Not supported format "),
+	ERR_ENTRY("MEDIACODEC_ERROR_BUFFER_NOT_AVAILABLE", TIZEN_ERROR_MEDIACODEC | 0x0c ,"Not available buffer"),
+#endif
+#if defined (TIZEN_ERROR_BLUETOOTH)
+	ERR_ENTRY("BT_ERROR_NOT_INITIALIZED", TIZEN_ERROR_BLUETOOTH | 0x0101 ,"Local adapter not initialized"),
+	ERR_ENTRY("BT_ERROR_NOT_ENABLED", TIZEN_ERROR_BLUETOOTH | 0x0102 ,"Local adapter not enabled"),
+	ERR_ENTRY("BT_ERROR_ALREADY_DONE", TIZEN_ERROR_BLUETOOTH | 0x0103 ,"Operation already done"),
+	ERR_ENTRY("BT_ERROR_OPERATION_FAILED", TIZEN_ERROR_BLUETOOTH | 0x0104 ,"Operation failed"),
+	ERR_ENTRY("BT_ERROR_NOT_IN_PROGRESS", TIZEN_ERROR_BLUETOOTH | 0x0105 ,"Operation not in progress"),
+	ERR_ENTRY("BT_ERROR_REMOTE_DEVICE_NOT_BONDED", TIZEN_ERROR_BLUETOOTH | 0x0106 ,"Remote device not bonde"),
+	ERR_ENTRY("BT_ERROR_AUTH_REJECTED", TIZEN_ERROR_BLUETOOTH | 0x0107 ,"Authentication rejected"),
+	ERR_ENTRY("BT_ERROR_AUTH_FAILED", TIZEN_ERROR_BLUETOOTH | 0x0108 ,"Authentication failed"),
+	ERR_ENTRY("BT_ERROR_REMOTE_DEVICE_NOT_FOUND", TIZEN_ERROR_BLUETOOTH | 0x0109 ,"Remote device not found "),
+	ERR_ENTRY("BT_ERROR_SERVICE_SEARCH_FAILED", TIZEN_ERROR_BLUETOOTH | 0x010A ,"Service search failed"),
+	ERR_ENTRY("BT_ERROR_REMOTE_DEVICE_NOT_CONNECTED", TIZEN_ERROR_BLUETOOTH | 0x010B ,"Remote device is not connected"),
+	ERR_ENTRY("BT_ERROR_AGAIN", TIZEN_ERROR_BLUETOOTH | 0x010C ,"Resource temporarily unavailable "),
+	ERR_ENTRY("BT_ERROR_SERVICE_NOT_FOUND", TIZEN_ERROR_BLUETOOTH | 0x010D ,"Service not found"),
+#endif
+#if defined (TIZEN_ERROR_CONNECTION)
+	ERR_ENTRY("CONNECTION_ERROR_OPERATION_FAILED",TIZEN_ERROR_CONNECTION|0x0401 ,"Operation failed"),
+	ERR_ENTRY("CONNECTION_ERROR_ITERATOR_END",TIZEN_ERROR_CONNECTION|0x0402 ,"End of iteration"),
+	ERR_ENTRY("CONNECTION_ERROR_NO_CONNECTION",TIZEN_ERROR_CONNECTION|0x0403 ,"There is no connection"),
+	ERR_ENTRY("CONNECTION_ERROR_ALREADY_EXISTS",TIZEN_ERROR_CONNECTION|0x0404 ,"Already exists"),
+	ERR_ENTRY("CONNECTION_ERROR_OPERATION_ABORTED",TIZEN_ERROR_CONNECTION|0x0405 ,"Operation is aborted"),
+	ERR_ENTRY("CONNECTION_ERROR_DHCP_FAILED",TIZEN_ERROR_CONNECTION|0x0406, "DHCP failed"),
+	ERR_ENTRY("CONNECTION_ERROR_INVALID_KEY",TIZEN_ERROR_CONNECTION|0x0407,"Invalid key"),
+	ERR_ENTRY("CONNECTION_ERROR_NO_REPLY",TIZEN_ERROR_CONNECTION|0x0408,"No reply"),
+#endif
+#if defined (TIZEN_ERROR_NFC)
+	ERR_ENTRY("NFC_ERROR_OPERATION_FAILED",TIZEN_ERROR_NFC|0x01 ,"Operation failed"),
+	ERR_ENTRY("NFC_ERROR_INVALID_NDEF_MESSAGE",TIZEN_ERROR_NFC|0x02 ,"Invalid NDEF message"),
+	ERR_ENTRY("NFC_ERROR_INVALID_RECORD_TYPE",TIZEN_ERROR_NFC|0x03 ,"Invalid record type"),
+	ERR_ENTRY("NFC_ERROR_NO_DEVICE",TIZEN_ERROR_NFC|0x04 ,"No device"),
+	ERR_ENTRY("NFC_ERROR_NOT_ACTIVATED",TIZEN_ERROR_NFC|0x05 ,"NFC is not activated"),
+	ERR_ENTRY("NFC_ERROR_ALREADY_ACTIVATED",TIZEN_ERROR_NFC|0x06 ,"Already activated"),
+	ERR_ENTRY("NFC_ERROR_ALREADY_DEACTIVATED",TIZEN_ERROR_NFC|0x07 ,"Already deactivated"),
+	ERR_ENTRY("NFC_ERROR_READ_ONLY_NDEF",TIZEN_ERROR_NFC|0x08 ,"Read only tag"),
+	ERR_ENTRY("NFC_ERROR_NO_SPACE_ON_NDEF",TIZEN_ERROR_NFC|0x09 ,"No enough space on tag"),
+	ERR_ENTRY("NFC_ERROR_NO_NDEF_MESSAGE",TIZEN_ERROR_NFC|0x0a ,"No NDEF Message on Tag"),
+	ERR_ENTRY("NFC_ERROR_NOT_NDEF_FORMAT",TIZEN_ERROR_NFC|0x0b ,"Not NDEF format Tag "),
+	ERR_ENTRY("NFC_ERROR_SECURITY_RESTRICTED",TIZEN_ERROR_NFC|0x0c ,"Restricted by access control"),
+	ERR_ENTRY("NFC_ERROR_ILLEGAL_STATE",TIZEN_ERROR_NFC|0x0d ,"The state is wrong"),
+	ERR_ENTRY("NFC_ERROR_NOT_INITIALIZED",TIZEN_ERROR_NFC|0x0e ,"NFC is not initialized"),
+	ERR_ENTRY("NFC_ERROR_TAG_NOT_SUPPORTED",TIZEN_ERROR_NFC|0x0f ,"Tag is not supported"),
+	ERR_ENTRY("NFC_ERROR_AID_ALREADY_REGISTERED",TIZEN_ERROR_NFC | 0x10 ,"AID already registered"),
+#endif
+#if defined (TIZEN_ERROR_TETHERING)
+	ERR_ENTRY("TETHERING_ERROR_NOT_ENABLED",TIZEN_ERROR_TETHERING | 0x0501 ,"Not enabled"),
+	ERR_ENTRY("TETHERING_ERROR_OPERATION_FAILED",TIZEN_ERROR_TETHERING | 0x0502 ,"Operation failed"),
+#endif
+#if defined (TIZEN_ERROR_WIFI)
+	ERR_ENTRY("WIFI_ERROR_OPERATION_FAILED",TIZEN_ERROR_WIFI | 0x0301 ,"Operation failed"),
+	ERR_ENTRY("WIFI_ERROR_NO_CONNECTION",TIZEN_ERROR_WIFI | 0x0302 ,"There is no connected AP"),
+	ERR_ENTRY("WIFI_ERROR_ALREADY_EXISTS",TIZEN_ERROR_WIFI | 0x0303 ,"Already exists"),
+	ERR_ENTRY("WIFI_ERROR_OPERATION_ABORTED",TIZEN_ERROR_WIFI | 0x0304 ,"Operation is aborted "),
+	ERR_ENTRY("WIFI_ERROR_DHCP_FAILED",TIZEN_ERROR_WIFI | 0x0306 ,"DHCP failed"),
+	ERR_ENTRY("WIFI_ERROR_INVALID_KEY",TIZEN_ERROR_WIFI | 0x0307 ,"Invalid key"),
+	ERR_ENTRY("WIFI_ERROR_NO_REPLY",TIZEN_ERROR_WIFI | 0x0308 ,"No reply"),
+	ERR_ENTRY("WIFI_ERROR_SECURITY_RESTRICTED",TIZEN_ERROR_WIFI | 0x0309 ,"Restricted by security system policy"),
+#endif
+#if defined (TIZEN_ERROR_WIFI_DIRECT)
+	ERR_ENTRY("WIFI_DIRECT_ERROR_NOT_INITIALIZED",TIZEN_ERROR_WIFI_DIRECT | 0x01 ,"Not initialized"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_COMMUNICATION_FAILED",TIZEN_ERROR_WIFI_DIRECT | 0x02 ,"I/O error"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_WIFI_USED",TIZEN_ERROR_WIFI_DIRECT | 0x03 ,"WiFi is being used"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_MOBILE_AP_USED",TIZEN_ERROR_WIFI_DIRECT | 0x04 ,"Mobile AP is being used"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_CONNECTION_FAILED",TIZEN_ERROR_WIFI_DIRECT | 0x05 ,"Mobile AP is being used"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_AUTH_FAILED",TIZEN_ERROR_WIFI_DIRECT | 0x06 ,"Authentication failed"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_OPERATION_FAILED",TIZEN_ERROR_WIFI_DIRECT | 0x07 ,"Operation failed"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_TOO_MANY_CLIENT",TIZEN_ERROR_WIFI_DIRECT | 0x08 ,"Many client"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_ALREADY_INITIALIZED",TIZEN_ERROR_WIFI_DIRECT | 0x09 ,"Already initialized client"),
+	ERR_ENTRY("WIFI_DIRECT_ERROR_CONNECTION_CANCELED",TIZEN_ERROR_WIFI_DIRECT | 0x10 ,"Connection canceled by local device"),
+#endif
+#if defined (TIZEN_ERROR_KEY_MANAGER)
+	ERR_ENTRY("CKMC_ERROR_SOCKET",TIZEN_ERROR_KEY_MANAGER | 0x01 ,"Socket error between client and Central Key Manager"),
+	ERR_ENTRY("CKMC_ERROR_BAD_REQUEST",TIZEN_ERROR_KEY_MANAGER | 0x02 ,"Invalid request from client "),
+	ERR_ENTRY("CKMC_ERROR_BAD_RESPONSE",TIZEN_ERROR_KEY_MANAGER | 0x03 ,"Invalid response from Central Key Manager"),
+	ERR_ENTRY("CKMC_ERROR_SEND_FAILED",TIZEN_ERROR_KEY_MANAGER | 0x04 ,"Transmitting request failed"),
+	ERR_ENTRY("CKMC_ERROR_RECV_FAILED",TIZEN_ERROR_KEY_MANAGER | 0x05 ,"Receiving response failed"),
+	ERR_ENTRY("CKMC_ERROR_AUTHENTICATION_FAILED",TIZEN_ERROR_KEY_MANAGER | 0x06 ,"Authentication between client and manager failed"),
+	ERR_ENTRY("CKMC_ERROR_BUFFER_TOO_SMALL",TIZEN_ERROR_KEY_MANAGER | 0x07 ,"The output buffer size which is passed as parameter is too small"),
+	ERR_ENTRY("CKMC_ERROR_SERVER_ERROR",TIZEN_ERROR_KEY_MANAGER | 0x08 ,"Central Key Manager has been failed for some reason"),
+	ERR_ENTRY("CKMC_ERROR_DB_LOCKED",TIZEN_ERROR_KEY_MANAGER | 0x09 ,"The database was not unlocked - user did not login"),
+	ERR_ENTRY("CKMC_ERROR_DB_ERROR",TIZEN_ERROR_KEY_MANAGER | 0x0A ,"An internal error inside the database"),
+	ERR_ENTRY("CKMC_ERROR_DB_ALIAS_EXISTS",TIZEN_ERROR_KEY_MANAGER | 0x0B ,"Provided alias already exists in the database"),
+	ERR_ENTRY("CKMC_ERROR_DB_ALIAS_UNKNOWN",TIZEN_ERROR_KEY_MANAGER | 0x0C ,"No data for given alias"),
+	ERR_ENTRY("CKMC_ERROR_VERIFICATION_FAILED",TIZEN_ERROR_KEY_MANAGER | 0x0D ,"CA certificate(s) were unknown and chain could not be created"),
+	ERR_ENTRY("CKMC_ERROR_INVALID_FORMAT",TIZEN_ERROR_KEY_MANAGER | 0x0E ,"A provided file doesn't exists or cannot be accessed in the file system"),
+	ERR_ENTRY("CKMC_ERROR_FILE_ACCESS_DENIED",TIZEN_ERROR_KEY_MANAGER | 0x0F ,"A provided file or binary has not a valid format"),
+	ERR_ENTRY("CKMC_ERROR_NOT_EXPORTABLE",TIZEN_ERROR_KEY_MANAGER | 0x10 ,"Key is not exportable. It could not be returned to client"),
+	ERR_ENTRY("CKMC_ERROR_FILE_SYSTEM",TIZEN_ERROR_KEY_MANAGER | 0x11 ,"Save key\/certificate\/pkcs12 failed because of file system error"),
+	ERR_ENTRY("CKMC_ERROR_UNKNOWN",TIZEN_ERROR_KEY_MANAGER | 0xFF ,"The error with unknown reason"),
+#endif
+#if defined (TIZEN_ERROR_CALENDAR)
+	ERR_ENTRY("CALENDAR_ERROR_DB_FAILED",TIZEN_ERROR_CALENDAR | 0x02 ,"No access to the database"),
+	ERR_ENTRY("CALENDAR_ERROR_ITERATOR_END",TIZEN_ERROR_CALENDAR | 0x04 ,"Iterator is on the last position"),
+	ERR_ENTRY("CALENDAR_ERROR_DB_RECORD_NOT_FOUND",TIZEN_ERROR_CALENDAR | 0x05 ,"Database not found"),
+	ERR_ENTRY("CALENDAR_ERROR_IPC",TIZEN_ERROR_CALENDAR | 0xBF ,"Unknown IPC error"),
+	ERR_ENTRY("CALENDAR_ERROR_SYSTEM",TIZEN_ERROR_CALENDAR | 0xEF ,"Error from another modules"),
+#endif
+#if defined (TIZEN_ERROR_CONTACTS)
+	ERR_ENTRY("CONTACTS_ERROR_DB_LOCKED",TIZEN_ERROR_CONTACTS | 0x81 ,"Database table locked or file locked"),
+	ERR_ENTRY("CONTACTS_ERROR_DB",TIZEN_ERROR_CONTACTS | 0x9F ,"Unknown DB error"),
+	ERR_ENTRY("CONTACTS_ERROR_IPC_NOT_AVALIABLE",TIZEN_ERROR_CONTACTS | 0xB1 ,"IPC server is not available"),
+	ERR_ENTRY("CONTACTS_ERROR_IPC",TIZEN_ERROR_CONTACTS | 0xBF ,"Unknown IPC error"),
+	ERR_ENTRY("CONTACTS_ERROR_SYSTEM",TIZEN_ERROR_CONTACTS | 0xEF ,"Internal system module error"),
+	ERR_ENTRY("CONTACTS_ERROR_INTERNAL",TIZEN_ERROR_CONTACTS | 0xFF ,"Implementation Error, Temporary Use"),
+#endif
+#if defined (TIZEN_ERROR_STORAGE)//issue : TIZEN_ERROR_SYSTEM_CLASS
+	ERR_ENTRY("STORAGE_ERROR_OPERATION_FAILED",TIZEN_ERROR_SYSTEM_CLASS | 0x12 ,"Operation failed"),
+#endif
+#if defined (TIZEN_ERROR_DEVICE)
+	ERR_ENTRY("DEVICE_ERROR_NOT_INITIALIZED",TIZEN_ERROR_DEVICE | 0x13 ,"Not initialized"),
+#endif
+#if defined (TIZEN_ERROR_DLOG)
+#endif
+#if defined (TIZEN_ERROR_MEDIA_KEY)
+	ERR_ENTRY("MEDIA_KEY_ERROR_OPERATION_FAILED",TIZEN_ERROR_MEDIA_KEY | 0x01 ,"Reserve/Release failed"),
+#endif
+#if defined (TIZEN_ERROR_RUNTIME_INFORMATION)
+#endif
+#if defined (TIZEN_ERROR_SENSOR)
+	ERR_ENTRY("SENSOR_ERROR_NOT_NEED_CALIBRATION",TIZEN_ERROR_SENSOR | 0x03 ,"Sensor doesn't need calibration"),
+	ERR_ENTRY("SENSOR_ERROR_OPERATION_FAILED",TIZEN_ERROR_SENSOR | 0x06 ,"Operation failed"),
+#endif
+#if defined (TIZEN_ERROR_SYSTEM_INFORMATION)
+#endif
+#if defined (TIZEN_ERROR_SYSTEM_SETTING)
+	ERR_ENTRY("SYSTEM_SETTINGS_ERROR_LOCKSCREEN_APP_PASSWORD_MODE",TIZEN_ERROR_SYSTEM_SETTING | 0x01 ,"Current lock screen app set 'password' type"),
+#endif
+#if defined (TIZEN_ERROR_SYSTEM_RESOURCE)
+#endif
+#if defined (TIZEN_ERROR_CONTEXT)
+	ERR_ENTRY("ACTIVITY_ERROR_ALREADY_STARTED",TIZEN_ERROR_CONTEXT | 0x01 ,"Recognition is already started"),
+	ERR_ENTRY("ACTIVITY_ERROR_NOT_STARTED",TIZEN_ERROR_CONTEXT | 0x02 ,"Recognition is not started"),
+	ERR_ENTRY("ACTIVITY_ERROR_OPERATION_FAILED",TIZEN_ERROR_CONTEXT | 0x04 ,"Operation failed because of a system error"),
+#endif
+#if defined (TIZEN_ERROR_TELEPHONY)
+	ERR_ENTRY("TELEPHONY_ERROR_OPERATION_FAILED",TIZEN_ERROR_TELEPHONY | 0x0001 ,"Operation failed"),
+	ERR_ENTRY("TELEPHONY_ERROR_SIM_NOT_AVAILABLE",TIZEN_ERROR_TELEPHONY | 0x1001 ,"SIM is not available"),
+#endif
+#if defined (TIZEN_ERROR_EFL_UTIL)
+	ERR_ENTRY("EFL_UTIL_ERROR_NOT_SUPPORTED_WINDOW_TYPE",TIZEN_ERROR_EFL_UTIL | 0x01 ,"Window type not supported"),
+#endif
+#if defined (TIZEN_ERROR_UTILX)
+#endif
+#if defined (TIZEN_ERROR_NATIVE_BUFFER)
+#endif
+#if defined (TIZEN_ERROR_TBM)
+#endif
+#if defined (TIZEN_ERROR_DOWNLOAD)
+	ERR_ENTRY("DOWNLOAD_ERROR_INVALID_STATE",TIZEN_ERROR_DOWNLOAD | 0x21 ,"Invalid state"),
+	ERR_ENTRY("DOWNLOAD_ERROR_CONNECTION_FAILED",TIZEN_ERROR_DOWNLOAD | 0x22 ,"Connection failed"),
+	ERR_ENTRY("DOWNLOAD_ERROR_INVALID_URL",TIZEN_ERROR_DOWNLOAD | 0x24 ,"Invalid URL"),
+	ERR_ENTRY("DOWNLOAD_ERROR_INVALID_DESTINATION",TIZEN_ERROR_DOWNLOAD | 0x25 ,"Invalid destination"),
+	ERR_ENTRY("DOWNLOAD_ERROR_TOO_MANY_DOWNLOADS",TIZEN_ERROR_DOWNLOAD | 0x26 ,"Too many simultaneous downloads"),
+	ERR_ENTRY("DOWNLOAD_ERROR_QUEUE_FULL",TIZEN_ERROR_DOWNLOAD | 0x27 ,"Download server queue is full"),
+	ERR_ENTRY("DOWNLOAD_ERROR_ALREADY_COMPLETED",TIZEN_ERROR_DOWNLOAD | 0x28 ,"The download is already completed"),
+	ERR_ENTRY("DOWNLOAD_ERROR_FILE_ALREADY_EXISTS",TIZEN_ERROR_DOWNLOAD | 0x29 ,"Failed to rename the downloaded file"),
+	ERR_ENTRY("DOWNLOAD_ERROR_CANNOT_RESUME",TIZEN_ERROR_DOWNLOAD | 0x2a ,"Cannot resume"),
+	ERR_ENTRY("DOWNLOAD_ERROR_FIELD_NOT_FOUND",TIZEN_ERROR_DOWNLOAD | 0x2b ,"Specified field not found"),
+	ERR_ENTRY("DOWNLOAD_ERROR_TOO_MANY_REDIRECTS",TIZEN_ERROR_DOWNLOAD | 0x30 ,"Too many redirects from HTTP response header"),
+	ERR_ENTRY("DOWNLOAD_ERROR_UNHANDLED_HTTP_CODE",TIZEN_ERROR_DOWNLOAD | 0x31 ,"The download cannot handle the HTTP status value"),
+	ERR_ENTRY("DOWNLOAD_ERROR_REQUEST_TIMEOUT",TIZEN_ERROR_DOWNLOAD | 0x32 ,"No action after client creates a download ID"),
+	ERR_ENTRY("DOWNLOAD_ERROR_RESPONSE_TIMEOUT",TIZEN_ERROR_DOWNLOAD | 0x33 ,"No call to start API for some time although the download is created"),
+	ERR_ENTRY("DOWNLOAD_ERROR_SYSTEM_DOWN",TIZEN_ERROR_DOWNLOAD | 0x34 ,"No response from client after rebooting download daemon"),
+	ERR_ENTRY("DOWNLOAD_ERROR_ID_NOT_FOUND",TIZEN_ERROR_DOWNLOAD | 0x35 ,"Download ID does not exist in download service module"),
+	ERR_ENTRY("DOWNLOAD_ERROR_INVALID_NETWORK_TYPE",TIZEN_ERROR_DOWNLOAD | 0x36 ,"Network bonding is set but network type is not set as DOWNLOAD_NETWORK_ALL"),
+#endif
+#if defined (TIZEN_ERROR_WEBVIEW)
+#endif
+#if defined (TIZEN_ERROR_LOCATION_MANAGER)
+	ERR_ENTRY("LOCATIONS_ERROR_INCORRECT_METHOD",TIZEN_ERROR_LOCATION_MANAGER | 0x01 ,"Location manager contains incorrect method for a given call"),
+	ERR_ENTRY("LOCATIONS_ERROR_NETWORK_FAILED",TIZEN_ERROR_LOCATION_MANAGER | 0x02 ,"Network unavailable"),
+	ERR_ENTRY("LOCATIONS_ERROR_SERVICE_NOT_AVAILABLE",TIZEN_ERROR_LOCATION_MANAGER | 0x03,"Location service is not available"),
+	ERR_ENTRY("LOCATIONS_ERROR_GPS_SETTING_OFF",TIZEN_ERROR_LOCATION_MANAGER | 0x04 ,"GPS/WPS setting is not enabled"),
+	ERR_ENTRY("LOCATIONS_ERROR_SECURITY_RESTRICTED",TIZEN_ERROR_LOCATION_MANAGER | 0x05 ,"Restricted by security system policy"),
+	ERR_ENTRY("LOCATION_BOUNDS_ERROR_INCORRECT_TYPE",TIZEN_ERROR_LOCATION_MANAGER | 0x21 ,"Incorrect bounds type for a given call"),
+	ERR_ENTRY("LOCATION_BOUNDS_ERROR_IS_ADDED",TIZEN_ERROR_LOCATION_MANAGER | 0x22 ,"Cannot remove bounds handle from location manager"),
+#endif
+#if defined (TIZEN_ERROR_STT)
+	ERR_ENTRY("STT_ERROR_INVALID_STATE",TIZEN_ERROR_STT | 0x01 ,"Invalid state"),
+	ERR_ENTRY("STT_ERROR_INVALID_LANGUAGE",TIZEN_ERROR_STT | 0x02 ,"Invalid language"),
+	ERR_ENTRY("STT_ERROR_ENGINE_NOT_FOUND",TIZEN_ERROR_STT | 0x03 ,"No available engine"),
+	ERR_ENTRY("STT_ERROR_OPERATION_FAILED",TIZEN_ERROR_STT | 0x04 ,"Operation failed"),
+	ERR_ENTRY("STT_ERROR_NOT_SUPPORTED_FEATURE",TIZEN_ERROR_STT | 0x05 ,"Not supported feature of current engine"),
+#endif
+#if defined (TIZEN_ERROR_TTS)
+	ERR_ENTRY("TTS_ERROR_INVALID_STATE",TIZEN_ERROR_TTS | 0x01 ,"Invalid state"),
+	ERR_ENTRY("TTS_ERROR_INVALID_VOICE",TIZEN_ERROR_TTS | 0x02 ,"Invalid voice"),
+	ERR_ENTRY("TTS_ERROR_ENGINE_NOT_FOUND",TIZEN_ERROR_TTS | 0x03 ,"No available engine"),
+	ERR_ENTRY("TTS_ERROR_OPERATION_FAILED",TIZEN_ERROR_TTS | 0x04 ,"Operation failed"),
+	ERR_ENTRY("TTS_ERROR_AUDIO_POLICY_BLOCKED",TIZEN_ERROR_TTS | 0x05 ,"Audio policy blocked"),
+#endif
+#if defined (TIZEN_ERROR_SMARTCARD)
+	ERR_ENTRY("SMARTCARD_ERROR_GENERAL",TIZEN_ERROR_SMARTCARD | 0x01 ,"A general error occurred"),
+	ERR_ENTRY("SMARTCARD_ERROR_NO_SUCH_ELEMENT",TIZEN_ERROR_SMARTCARD | 0x02 ,"No such element error"),
+	ERR_ENTRY("SMARTCARD_ERROR_ILLEGAL_STATE",TIZEN_ERROR_SMARTCARD | 0x03 ,"Illegal state of execution error"),
+	ERR_ENTRY("SMARTCARD_ERROR_ILLEGAL_REFERENCE",TIZEN_ERROR_SMARTCARD | 0x04 ,"Illegal reference"),
+	ERR_ENTRY("SMARTCARD_ERROR_OPERATION_NOT_SUPPORTED",TIZEN_ERROR_SMARTCARD | 0x05 ,"Operation not supported from SE"),
+	ERR_ENTRY("SMARTCARD_ERROR_CHANNEL_NOT_AVAILABLE",TIZEN_ERROR_SMARTCARD | 0x06 ,"No channel available"),
+	ERR_ENTRY("SMARTCARD_ERROR_NOT_INITIALIZED",TIZEN_ERROR_SMARTCARD | 0x07 ,"Smartcard service not initialized"),
+#endif
+#if defined (TIZEN_ERROR_HEALTH)
+	ERR_ENTRY("HEALTH_ERROR_DATA_TYPE_NOT_FOUND",TIZEN_ERROR_HEALTH  | 0x01 ,"Maifest for the data type specified not found"),
+	ERR_ENTRY("HEALTH_ERROR_MANDATORY_DATA_REQURIED",TIZEN_ERROR_HEALTH  | 0x02 ,"Mandatory property is missing"),
+	ERR_ENTRY("HEALTH_ERROR_INVALID_DATA",TIZEN_ERROR_HEALTH  | 0x03 ,"Data is out of range or invalid type"),
+#endif
+#if defined (TIZEN_ERROR_VOICE_CONTROL)
+	ERR_ENTRY("VC_ERROR_INVALID_STATE",TIZEN_ERROR_VOICE_CONTROL | 0x011 ,"Invalid state"),
+	ERR_ENTRY("VC_ERROR_INVALID_LANGUAGE",TIZEN_ERROR_VOICE_CONTROL | 0x012 ,"Invalid language"),
+	ERR_ENTRY("VC_ERROR_ENGINE_NOT_FOUND",TIZEN_ERROR_VOICE_CONTROL | 0x013 ,"No available engine"),
+	ERR_ENTRY("VC_ERROR_OPERATION_FAILED",TIZEN_ERROR_VOICE_CONTROL | 0x014 ,"Operation failed"),
+	ERR_ENTRY("VC_ERROR_OPERATION_REJECTED",TIZEN_ERROR_VOICE_CONTROL | 0x015 ,"Operation rejected"),
+	ERR_ENTRY("VC_ERROR_ITERATION_END",TIZEN_ERROR_VOICE_CONTROL | 0x016 ,"List reached end"),
+	ERR_ENTRY("VC_ERROR_EMPTY",TIZEN_ERROR_VOICE_CONTROL | 0x017 ,"List empty"),
+	//voice ui control
+	ERR_ENTRY("VC_ELM_ERROR_INVALID_STATE",TIZEN_ERROR_VOICE_CONTROL | 0x021 ," Invalid state"),
+	ERR_ENTRY("VC_ELM_ERROR_INVALID_LANGUAG",TIZEN_ERROR_VOICE_CONTROL | 0x022 ,"Invalid language"),
+	ERR_ENTRY("VC_ELM_ERROR_OPERATION_FAILED",TIZEN_ERROR_VOICE_CONTROL | 0x023 ,"Operation failed"),
+	ERR_ENTRY("VC_ELM_ERROR_OPERATION_REJECTED",TIZEN_ERROR_VOICE_CONTROL | 0x024 ,"Operation rejected"),
+#endif
+#if defined (TIZEN_ERROR_WIDGET)
+	ERR_ENTRY("WIDGET_ERROR_FAULT",TIZEN_ERROR_WIDGET | 0x0001 ,"Fault - Unable to recover from the error"),
+	ERR_ENTRY("WIDGET_ERROR_ALREADY_EXIST",TIZEN_ERROR_WIDGET | 0x0002 ,"Already exists"),
+	ERR_ENTRY("WIDGET_ERROR_ALREADY_STARTED",TIZEN_ERROR_WIDGET | 0x0004 ,"Operation is already started"),
+	ERR_ENTRY("WIDGET_ERROR_NOT_EXIST",TIZEN_ERROR_WIDGET | 0x0008 ,"Not exists"),
+	ERR_ENTRY("WIDGET_ERROR_DISABLED",TIZEN_ERROR_WIDGET | 0x00010 ,"Disabled"),
+#endif
+	{0,NULL,NULL}
+};
+
+static __thread int tizen_last_error = TIZEN_ERROR_NONE;
+
+int get_last_result(void)
+{
+        return tizen_last_error;
+}
+
+void set_last_result(int err)
+{
+	tizen_last_error = err;
+}
+
+char* _get_error_message(int err_code)
+{
+	char* msg = NULL;
+	int i,arry_cnt;
+	arry_cnt = sizeof(err_list)/sizeof(err_info);
+	for(i = 0; i < arry_cnt ; i++)
+	{
+		if(err_code == err_list[i].value)
+		{
+			msg = err_list[i].msg;
+			break;
+		}
+	}
+	return msg;
+}
+
+char* get_error_message(int err_code)
+{
+	static __thread char msg[512];
+	char *tmp = NULL;
+	memset(msg,0x00,sizeof(msg));
+
+	if( err_code >= TIZEN_ERROR_OWNER_DEAD && err_code < 0)
+	{
+		if((~err_code+1) == -ENOSYS)
+		{
+			strncpy(msg,"Invalid operation",strlen("Invalid operation"));
+		}
+		else
+		{
+			strerror_r(~err_code + 1, msg, sizeof(msg));
+		}
+	}
+	else if(err_code >= TIZEN_ERROR_MIN_PLATFORM_ERROR && err_code < TIZEN_ERROR_END_OF_COLLECTION)
+	{
+		tmp = _get_error_message(err_code);
+		if(tmp != NULL)
+		{
+			strncpy(msg,tmp,strlen(tmp));
+		}
+	}
+	else if(err_code >= TIZEN_ERROR_MIN_PLATFORM_MODULE && err_code < -0x009F0000)
+	{
+		tmp = _get_error_message(err_code);
+		if(tmp != NULL)
+		{
+			strncpy(msg,tmp,strlen(tmp));
+		}
+	}
+	else{;}
+	return msg;
+}
+
