@@ -1,7 +1,7 @@
 Name:       capi-base-common
 Summary:    Common header files of Tizen Native API
-Version: 0.1.9
-Release:   0
+Version: 0.2.2
+Release:   1
 Group:      Base
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
@@ -14,7 +14,7 @@ Common header files of Tizen Native API
   
 %package devel  
 License:  Apache-2.0
-Summary:  Common header files of Tizen Native API (Development)
+Summary:  Common header files of Tizen Native API (Development)  
 Group:    Base
 Requires: %{name} = %{version}-%{release}  
   

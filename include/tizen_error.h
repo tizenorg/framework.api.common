@@ -102,8 +102,6 @@ extern "C" {
 #define TIZEN_ERROR_PACKAGE_MANAGER	-0x01150000
 /* Tizen Shortcut Error */
 #define TIZEN_ERROR_SHORTCUT		-0x01160000
-/* Tizen UI Gadget Error */
-#define TIZEN_ERROR_UI_GADGET		-0x01170000
 /* Tizen Bundle Error */
 #define TIZEN_ERROR_BUNDLE		-0x01180000
 /* Tizen Data Control Error */
@@ -150,6 +148,8 @@ extern "C" {
 #define TIZEN_ERROR_MEDIACODEC          -0x019B0000
 /* Tizen Metadata Editor Error */
 #define TIZEN_ERROR_METADATA_EDITOR     -0x019C0000
+/* Tizen Media Vision Error */
+#define TIZEN_ERROR_MEDIA_VISION        -0x019D0000
 /* Tizen Bluetooth Error */
 #define TIZEN_ERROR_BLUETOOTH		-0x01C00000
 /* Tizen Connection Error */
@@ -200,6 +200,8 @@ extern "C" {
 #define TIZEN_ERROR_CONTEXT		-0x02480000
 /* Tizen Health Error */
 #define TIZEN_ERROR_HEALTH		-0x02490000
+/* Tizen Feedback Error */
+#define TIZEN_ERROR_FEEDBACK            -0x024A0000
 /* Tizen Telephony Error */
 #define TIZEN_ERROR_TELEPHONY		-0x02600000
 /* Tizen EFL Util Error */
@@ -210,6 +212,12 @@ extern "C" {
 #define TIZEN_ERROR_NATIVE_BUFFER	-0x02820000
 /* Tizen Buffer Manager Error */
 #define TIZEN_ERROR_TBM			-0x02830000
+/* Tizen EOM Error */
+#define TIZEN_ERROR_EOM       		-0x02840000
+/* Tizen PANEL Error */
+#define TIZEN_ERROR_PANEL       -0x02850000
+/* Tizen TZSH Error */
+#define TIZEN_ERROR_TZSH       -0x02860000
 /* Tizen Download Error */
 #define TIZEN_ERROR_DOWNLOAD		-0x02A00000
 /* Tizen WebView Error */
@@ -218,6 +226,8 @@ extern "C" {
 #define TIZEN_ERROR_LOCATION_MANAGER	-0x02C00000
 /* Tizen Geofence Manager Error */
 #define TIZEN_ERROR_GEOFENCE_MANAGER    -0x02C10000
+/* Tizen Maps Service Error */
+#define TIZEN_ERROR_MAPS_SERVICE -0x02C20000
 /* Tizen STT Error */
 #define TIZEN_ERROR_STT			-0x02F00000
 /* Tizen TTS Error */
@@ -230,7 +240,6 @@ extern "C" {
 #define TIZEN_ERROR_WIDGET              -0x02F40000
 /* Tizen Voice Control Error */
 #define TIZEN_ERROR_VOICE_CONTROL       -0x02F50000
-
 
 
 /**
